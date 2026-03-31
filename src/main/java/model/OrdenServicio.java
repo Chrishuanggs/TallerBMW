@@ -13,7 +13,6 @@ public class OrdenServicio {
     private int idMecanico;
     private int idRecepcionista;
 
-    // Para mostrar en tabla
     private String placaVehiculo;
     private String nombreCliente;
     private String nombreMecanico;

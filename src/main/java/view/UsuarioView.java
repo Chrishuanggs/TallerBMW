@@ -1,8 +1,7 @@
 package view;
 
-import com.formdev.flatlaf.FlatDarkLaf;
-import controller.ClienteController;
-import model.Cliente;
+import controller.UsuarioController;
+import model.Usuario;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,11 +10,14 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
-public class ClienteView extends JFrame {
+public class UsuarioView extends JFrame {
 
-    private ClienteController controller;
+    private UsuarioController controller;
+    private Usuario usuarioActivo;
 
-    private JTextField txtNombre, txtTelefono, txtCorreo, txtDireccion, txtBuscar;
+    private JTextField txtNombre, txtUsuario, txtBuscar;
+    private JPasswordField txtPassword;
+    private JComboBox<String> cmbRol;
     private JTable tabla;
     private DefaultTableModel modeloTabla;
     private JLabel lblStatus;
@@ -28,10 +30,11 @@ public class ClienteView extends JFrame {
     private static final Color BG_CARD    = new Color(40, 40, 40);
     private static final Color TEXT_MUTED = new Color(150, 150, 150);
 
-    public ClienteView() {
-        controller = new ClienteController();
-        setTitle("Taller BMW — Clientes");
-        setSize(950, 620);
+    public UsuarioView(Usuario usuarioActivo) {
+        this.usuarioActivo = usuarioActivo;
+        controller = new UsuarioController();
+        setTitle("Taller BMW — Usuarios");
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         initUI();
@@ -51,13 +54,13 @@ public class ClienteView extends JFrame {
         header.setBackground(BG_CARD);
         header.setBorder(new EmptyBorder(15, 20, 15, 20));
 
-        JLabel titulo = new JLabel("Gestión de Clientes");
+        JLabel titulo = new JLabel("Gestión de Usuarios");
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titulo.setForeground(Color.WHITE);
 
         JPanel buscarPanel = new JPanel(new BorderLayout(8, 0));
         buscarPanel.setBackground(BG_CARD);
-        txtBuscar = styledField("Buscar por nombre o teléfono...");
+        txtBuscar = styledField("Buscar por nombre o usuario...");
         JButton btnBuscar = roundButton("Buscar", ACCENT);
         btnBuscar.addActionListener(e -> buscar());
         buscarPanel.add(txtBuscar, BorderLayout.CENTER);
@@ -88,32 +91,43 @@ public class ClienteView extends JFrame {
         ));
         card.setPreferredSize(new Dimension(280, 0));
 
-        JLabel lblForm = new JLabel("Nuevo Cliente");
+        JLabel lblForm = new JLabel("Datos del Usuario");
         lblForm.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblForm.setForeground(Color.WHITE);
         lblForm.setAlignmentX(LEFT_ALIGNMENT);
 
-        txtNombre    = styledField("");
-        txtTelefono  = styledField("");
-        txtCorreo    = styledField("");
-        txtDireccion = styledField("");
+        txtNombre  = styledField("");
+        txtUsuario = styledField("");
+
+        txtPassword = new JPasswordField();
+        txtPassword.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        cmbRol = new JComboBox<>(new String[]{"ADMIN", "RECEPCIONISTA", "MECANICO"});
+        cmbRol.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        JLabel lblHint = new JLabel("* Dejar contraseña vacía al actualizar");
+        lblHint.setFont(new Font("Segoe UI", Font.ITALIC, 10));
+        lblHint.setForeground(TEXT_MUTED);
+        lblHint.setAlignmentX(LEFT_ALIGNMENT);
 
         card.add(lblForm);
         card.add(Box.createVerticalStrut(15));
         card.add(buildFieldGroup("Nombre *", txtNombre));
         card.add(Box.createVerticalStrut(10));
-        card.add(buildFieldGroup("Teléfono *", txtTelefono));
+        card.add(buildFieldGroup("Usuario *", txtUsuario));
         card.add(Box.createVerticalStrut(10));
-        card.add(buildFieldGroup("Correo", txtCorreo));
+        card.add(buildFieldGroup("Contraseña *", txtPassword));
+        card.add(Box.createVerticalStrut(3));
+        card.add(lblHint);
         card.add(Box.createVerticalStrut(10));
-        card.add(buildFieldGroup("Dirección", txtDireccion));
+        card.add(buildComboGroup("Rol *", cmbRol));
         card.add(Box.createVerticalStrut(20));
         card.add(buildBotones());
 
         return card;
     }
 
-    private JPanel buildFieldGroup(String label, JTextField field) {
+    private JPanel buildFieldGroup(String label, JComponent field) {
         JPanel group = new JPanel(new BorderLayout(0, 4));
         group.setBackground(BG_CARD);
         group.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
@@ -123,6 +137,19 @@ public class ClienteView extends JFrame {
         lbl.setForeground(TEXT_MUTED);
         group.add(lbl, BorderLayout.NORTH);
         group.add(field, BorderLayout.CENTER);
+        return group;
+    }
+
+    private JPanel buildComboGroup(String label, JComboBox<String> combo) {
+        JPanel group = new JPanel(new BorderLayout(0, 4));
+        group.setBackground(BG_CARD);
+        group.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
+        group.setAlignmentX(LEFT_ALIGNMENT);
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lbl.setForeground(TEXT_MUTED);
+        group.add(lbl, BorderLayout.NORTH);
+        group.add(combo, BorderLayout.CENTER);
         return group;
     }
 
@@ -142,15 +169,13 @@ public class ClienteView extends JFrame {
         btnEliminar.addActionListener(e -> eliminar());
         btnLimpiar.addActionListener(e -> limpiar());
 
-        panel.add(btnGuardar);
-        panel.add(btnActualizar);
-        panel.add(btnEliminar);
-        panel.add(btnLimpiar);
+        panel.add(btnGuardar); panel.add(btnActualizar);
+        panel.add(btnEliminar); panel.add(btnLimpiar);
         return panel;
     }
 
     private JScrollPane buildTabla() {
-        String[] columnas = {"ID", "Nombre", "Teléfono", "Correo", "Dirección", "Registro"};
+        String[] columnas = {"ID", "Nombre", "Usuario", "Rol"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -168,13 +193,8 @@ public class ClienteView extends JFrame {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object val, boolean sel, boolean foc, int row, int col) {
                 super.getTableCellRendererComponent(t, val, sel, foc, row, col);
-                if (sel) {
-                    setBackground(ACCENT);
-                    setForeground(Color.WHITE);
-                } else {
-                    setBackground(row % 2 == 0 ? BG_CARD : new Color(45, 45, 45));
-                    setForeground(Color.WHITE);
-                }
+                if (sel) { setBackground(ACCENT); setForeground(Color.WHITE); }
+                else { setBackground(row % 2 == 0 ? BG_CARD : new Color(45, 45, 45)); setForeground(Color.WHITE); }
                 setBorder(new EmptyBorder(0, 8, 0, 8));
                 return this;
             }
@@ -185,10 +205,10 @@ public class ClienteView extends JFrame {
             if (fila >= 0) {
                 idSeleccionado = (int) modeloTabla.getValueAt(fila, 0);
                 txtNombre.setText((String) modeloTabla.getValueAt(fila, 1));
-                txtTelefono.setText((String) modeloTabla.getValueAt(fila, 2));
-                txtCorreo.setText((String) modeloTabla.getValueAt(fila, 3));
-                txtDireccion.setText((String) modeloTabla.getValueAt(fila, 4));
-                setStatus("Cliente seleccionado: " + modeloTabla.getValueAt(fila, 1), TEXT_MUTED);
+                txtUsuario.setText((String) modeloTabla.getValueAt(fila, 2));
+                txtPassword.setText("");
+                cmbRol.setSelectedItem(modeloTabla.getValueAt(fila, 3));
+                setStatus("Usuario seleccionado: " + modeloTabla.getValueAt(fila, 1), TEXT_MUTED);
             }
         });
 
@@ -208,35 +228,11 @@ public class ClienteView extends JFrame {
         return bar;
     }
 
-    private JTextField styledField(String placeholder) {
-        JTextField f = new JTextField();
-        f.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        f.putClientProperty("JTextField.placeholderText", placeholder);
-        return f;
-    }
-
-    private JButton roundButton(String text, Color bg) {
-        JButton btn = new JButton(text);
-        btn.setBackground(bg);
-        btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return btn;
-    }
-
-    private void setStatus(String msg, Color color) {
-        lblStatus.setText(msg);
-        lblStatus.setForeground(color);
-    }
-
     private void guardar() {
         try {
-            controller.registrar(txtNombre.getText(), txtTelefono.getText(), txtCorreo.getText(), txtDireccion.getText());
-            cargarTabla();
-            limpiar();
-            setStatus("Cliente registrado correctamente", SUCCESS);
+            controller.registrar(txtNombre.getText(), txtUsuario.getText(), new String(txtPassword.getPassword()), (String) cmbRol.getSelectedItem());
+            cargarTabla(); limpiar();
+            setStatus("Usuario registrado correctamente", SUCCESS);
         } catch (Exception ex) {
             setStatus("Error: " + ex.getMessage(), DANGER);
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -244,15 +240,11 @@ public class ClienteView extends JFrame {
     }
 
     private void actualizar() {
-        if (idSeleccionado == -1) {
-            JOptionPane.showMessageDialog(this, "Selecciona un cliente de la tabla primero");
-            return;
-        }
+        if (idSeleccionado == -1) { JOptionPane.showMessageDialog(this, "Selecciona un usuario de la tabla primero"); return; }
         try {
-            controller.actualizar(idSeleccionado, txtNombre.getText(), txtTelefono.getText(), txtCorreo.getText(), txtDireccion.getText());
-            cargarTabla();
-            limpiar();
-            setStatus("Cliente actualizado correctamente", SUCCESS);
+            controller.actualizar(idSeleccionado, txtNombre.getText(), txtUsuario.getText(), new String(txtPassword.getPassword()), (String) cmbRol.getSelectedItem());
+            cargarTabla(); limpiar();
+            setStatus("Usuario actualizado correctamente", SUCCESS);
         } catch (Exception ex) {
             setStatus("Error: " + ex.getMessage(), DANGER);
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -260,19 +252,13 @@ public class ClienteView extends JFrame {
     }
 
     private void eliminar() {
-        if (idSeleccionado == -1) {
-            JOptionPane.showMessageDialog(this, "Selecciona un cliente de la tabla primero");
-            return;
-        }
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Estás seguro de que deseas eliminar este cliente?", "Confirmar eliminación",
-                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (idSeleccionado == -1) { JOptionPane.showMessageDialog(this, "Selecciona un usuario de la tabla primero"); return; }
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas eliminar este usuario?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                controller.eliminar(idSeleccionado);
-                cargarTabla();
-                limpiar();
-                setStatus("Cliente eliminado", TEXT_MUTED);
+                controller.eliminar(idSeleccionado, usuarioActivo.getId());
+                cargarTabla(); limpiar();
+                setStatus("Usuario eliminado", TEXT_MUTED);
             } catch (Exception ex) {
                 setStatus("Error: " + ex.getMessage(), DANGER);
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -284,11 +270,10 @@ public class ClienteView extends JFrame {
         String texto = txtBuscar.getText().trim().toLowerCase();
         modeloTabla.setRowCount(0);
         try {
-            List<Cliente> clientes = controller.getClientes();
-            for (Cliente c : clientes) {
-                if (c.getNombre().toLowerCase().contains(texto) || c.getTelefono().contains(texto)) {
-                    modeloTabla.addRow(new Object[]{c.getId(), c.getNombre(), c.getTelefono(), c.getCorreo(), c.getDireccion(), c.getFechaRegistro()});
-                }
+            List<Usuario> usuarios = controller.getUsuarios();
+            for (Usuario u : usuarios) {
+                if (u.getNombre().toLowerCase().contains(texto) || u.getUsuario().toLowerCase().contains(texto))
+                    modeloTabla.addRow(new Object[]{u.getId(), u.getNombre(), u.getUsuario(), u.getRol()});
             }
             setStatus(modeloTabla.getRowCount() + " resultado(s) encontrado(s)", TEXT_MUTED);
         } catch (Exception ex) {
@@ -299,25 +284,37 @@ public class ClienteView extends JFrame {
     private void cargarTabla() {
         modeloTabla.setRowCount(0);
         try {
-            List<Cliente> clientes = controller.getClientes();
-            for (Cliente c : clientes) {
-                modeloTabla.addRow(new Object[]{c.getId(), c.getNombre(), c.getTelefono(), c.getCorreo(), c.getDireccion(), c.getFechaRegistro()});
-            }
-            setStatus(clientes.size() + " cliente(s) registrado(s)", TEXT_MUTED);
+            List<Usuario> usuarios = controller.getUsuarios();
+            for (Usuario u : usuarios)
+                modeloTabla.addRow(new Object[]{u.getId(), u.getNombre(), u.getUsuario(), u.getRol()});
+            setStatus(usuarios.size() + " usuario(s) registrado(s)", TEXT_MUTED);
         } catch (Exception ex) {
-            setStatus("Error cargando clientes: " + ex.getMessage(), DANGER);
+            setStatus("Error cargando usuarios: " + ex.getMessage(), DANGER);
         }
     }
 
     private void limpiar() {
-        txtNombre.setText(""); txtTelefono.setText(""); txtCorreo.setText("");
-        txtDireccion.setText(""); txtBuscar.setText("");
+        txtNombre.setText(""); txtUsuario.setText(""); txtPassword.setText(""); txtBuscar.setText("");
+        cmbRol.setSelectedIndex(0);
         idSeleccionado = -1;
         tabla.clearSelection();
     }
 
-    public static void main(String[] args) {
-        FlatDarkLaf.setup();
-        SwingUtilities.invokeLater(() -> new ClienteView().setVisible(true));
+    private JTextField styledField(String placeholder) {
+        JTextField f = new JTextField();
+        f.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        f.putClientProperty("JTextField.placeholderText", placeholder);
+        return f;
     }
+
+    private JButton roundButton(String text, Color bg) {
+        JButton btn = new JButton(text);
+        btn.setBackground(bg); btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btn.setFocusPainted(false); btn.setBorderPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+
+    private void setStatus(String msg, Color color) { lblStatus.setText(msg); lblStatus.setForeground(color); }
 }

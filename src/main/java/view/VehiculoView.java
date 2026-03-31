@@ -100,13 +100,9 @@ public class VehiculoView extends JFrame {
         lblForm.setForeground(Color.WHITE);
         lblForm.setAlignmentX(LEFT_ALIGNMENT);
 
-        txtPlaca  = styledField("");
-        txtMarca  = styledField("");
-        txtModelo = styledField("");
-        txtAnio   = styledField("");
-        txtColor  = styledField("");
-        txtVin    = styledField("");
-
+        txtPlaca  = styledField(""); txtMarca  = styledField("");
+        txtModelo = styledField(""); txtAnio   = styledField("");
+        txtColor  = styledField(""); txtVin    = styledField("");
         cmbCliente = new JComboBox<>();
         cmbCliente.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
@@ -136,11 +132,9 @@ public class VehiculoView extends JFrame {
         group.setBackground(BG_CARD);
         group.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
         group.setAlignmentX(LEFT_ALIGNMENT);
-
         JLabel lbl = new JLabel(label);
         lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lbl.setForeground(TEXT_MUTED);
-
         group.add(lbl, BorderLayout.NORTH);
         group.add(field, BorderLayout.CENTER);
         return group;
@@ -151,11 +145,9 @@ public class VehiculoView extends JFrame {
         group.setBackground(BG_CARD);
         group.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
         group.setAlignmentX(LEFT_ALIGNMENT);
-
         JLabel lbl = new JLabel(label);
         lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lbl.setForeground(TEXT_MUTED);
-
         group.add(lbl, BorderLayout.NORTH);
         group.add(combo, BorderLayout.CENTER);
         return group;
@@ -177,10 +169,8 @@ public class VehiculoView extends JFrame {
         btnEliminar.addActionListener(e -> eliminar());
         btnLimpiar.addActionListener(e -> limpiar());
 
-        panel.add(btnGuardar);
-        panel.add(btnActualizar);
-        panel.add(btnEliminar);
-        panel.add(btnLimpiar);
+        panel.add(btnGuardar); panel.add(btnActualizar);
+        panel.add(btnEliminar); panel.add(btnLimpiar);
         return panel;
     }
 
@@ -203,13 +193,8 @@ public class VehiculoView extends JFrame {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object val, boolean sel, boolean foc, int row, int col) {
                 super.getTableCellRendererComponent(t, val, sel, foc, row, col);
-                if (sel) {
-                    setBackground(ACCENT);
-                    setForeground(Color.WHITE);
-                } else {
-                    setBackground(row % 2 == 0 ? BG_CARD : new Color(45, 45, 45));
-                    setForeground(Color.WHITE);
-                }
+                if (sel) { setBackground(ACCENT); setForeground(Color.WHITE); }
+                else { setBackground(row % 2 == 0 ? BG_CARD : new Color(45, 45, 45)); setForeground(Color.WHITE); }
                 setBorder(new EmptyBorder(0, 8, 0, 8));
                 return this;
             }
@@ -227,10 +212,7 @@ public class VehiculoView extends JFrame {
                 txtVin.setText((String) modeloTabla.getValueAt(fila, 6));
                 String nombreCliente = (String) modeloTabla.getValueAt(fila, 7);
                 for (int i = 0; i < cmbCliente.getItemCount(); i++) {
-                    if (cmbCliente.getItemAt(i).equals(nombreCliente)) {
-                        cmbCliente.setSelectedIndex(i);
-                        break;
-                    }
+                    if (cmbCliente.getItemAt(i).equals(nombreCliente)) { cmbCliente.setSelectedIndex(i); break; }
                 }
                 setStatus("Vehículo seleccionado: " + txtPlaca.getText(), TEXT_MUTED);
             }
@@ -256,9 +238,7 @@ public class VehiculoView extends JFrame {
         try {
             clientes = clienteController.getClientes();
             cmbCliente.removeAllItems();
-            for (Cliente c : clientes) {
-                cmbCliente.addItem(c.getNombre());
-            }
+            for (Cliente c : clientes) cmbCliente.addItem(c.getNombre());
         } catch (Exception ex) {
             setStatus("Error cargando clientes: " + ex.getMessage(), DANGER);
         }
@@ -275,13 +255,8 @@ public class VehiculoView extends JFrame {
             int anio = Integer.parseInt(txtAnio.getText().trim());
             int idCliente = getClienteIdSeleccionado();
             if (idCliente == -1) throw new IllegalArgumentException("Selecciona un cliente");
-
-            controller.registrar(
-                    txtPlaca.getText(), txtMarca.getText(), txtModelo.getText(),
-                    anio, txtColor.getText(), txtVin.getText(), idCliente
-            );
-            cargarTabla();
-            limpiar();
+            controller.registrar(txtPlaca.getText(), txtMarca.getText(), txtModelo.getText(), anio, txtColor.getText(), txtVin.getText(), idCliente);
+            cargarTabla(); limpiar();
             setStatus("Vehículo registrado correctamente", SUCCESS);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "El año debe ser un número válido", "Error", JOptionPane.ERROR_MESSAGE);
@@ -292,21 +267,13 @@ public class VehiculoView extends JFrame {
     }
 
     private void actualizar() {
-        if (idSeleccionado == -1) {
-            JOptionPane.showMessageDialog(this, "Selecciona un vehículo de la tabla primero");
-            return;
-        }
+        if (idSeleccionado == -1) { JOptionPane.showMessageDialog(this, "Selecciona un vehículo de la tabla primero"); return; }
         try {
             int anio = Integer.parseInt(txtAnio.getText().trim());
             int idCliente = getClienteIdSeleccionado();
             if (idCliente == -1) throw new IllegalArgumentException("Selecciona un cliente");
-
-            controller.actualizar(
-                    idSeleccionado, txtPlaca.getText(), txtMarca.getText(), txtModelo.getText(),
-                    anio, txtColor.getText(), txtVin.getText(), idCliente
-            );
-            cargarTabla();
-            limpiar();
+            controller.actualizar(idSeleccionado, txtPlaca.getText(), txtMarca.getText(), txtModelo.getText(), anio, txtColor.getText(), txtVin.getText(), idCliente);
+            cargarTabla(); limpiar();
             setStatus("Vehículo actualizado correctamente", SUCCESS);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "El año debe ser un número válido", "Error", JOptionPane.ERROR_MESSAGE);
@@ -317,21 +284,12 @@ public class VehiculoView extends JFrame {
     }
 
     private void eliminar() {
-        if (idSeleccionado == -1) {
-            JOptionPane.showMessageDialog(this, "Selecciona un vehículo de la tabla primero");
-            return;
-        }
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Estás seguro de que deseas eliminar este vehículo?",
-                "Confirmar eliminación",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-        );
+        if (idSeleccionado == -1) { JOptionPane.showMessageDialog(this, "Selecciona un vehículo de la tabla primero"); return; }
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas eliminar este vehículo?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 controller.eliminar(idSeleccionado);
-                cargarTabla();
-                limpiar();
+                cargarTabla(); limpiar();
                 setStatus("Vehículo eliminado", TEXT_MUTED);
             } catch (Exception ex) {
                 setStatus("Error: " + ex.getMessage(), DANGER);
@@ -346,11 +304,8 @@ public class VehiculoView extends JFrame {
         try {
             List<Vehiculo> vehiculos = controller.getVehiculos();
             for (Vehiculo v : vehiculos) {
-                if (v.getPlaca().toLowerCase().contains(texto) ||
-                        v.getMarca().toLowerCase().contains(texto) ||
-                        v.getModelo().toLowerCase().contains(texto)) {
+                if (v.getPlaca().toLowerCase().contains(texto) || v.getMarca().toLowerCase().contains(texto) || v.getModelo().toLowerCase().contains(texto))
                     agregarFila(v);
-                }
             }
             setStatus(modeloTabla.getRowCount() + " resultado(s) encontrado(s)", TEXT_MUTED);
         } catch (Exception ex) {
@@ -362,9 +317,7 @@ public class VehiculoView extends JFrame {
         modeloTabla.setRowCount(0);
         try {
             List<Vehiculo> vehiculos = controller.getVehiculos();
-            for (Vehiculo v : vehiculos) {
-                agregarFila(v);
-            }
+            for (Vehiculo v : vehiculos) agregarFila(v);
             setStatus(vehiculos.size() + " vehículo(s) registrado(s)", TEXT_MUTED);
         } catch (Exception ex) {
             setStatus("Error cargando vehículos: " + ex.getMessage(), DANGER);
@@ -372,20 +325,12 @@ public class VehiculoView extends JFrame {
     }
 
     private void agregarFila(Vehiculo v) {
-        modeloTabla.addRow(new Object[]{
-                v.getId(), v.getPlaca(), v.getMarca(), v.getModelo(),
-                v.getAnio(), v.getColor(), v.getVin(), v.getNombreCliente()
-        });
+        modeloTabla.addRow(new Object[]{v.getId(), v.getPlaca(), v.getMarca(), v.getModelo(), v.getAnio(), v.getColor(), v.getVin(), v.getNombreCliente()});
     }
 
     private void limpiar() {
-        txtPlaca.setText("");
-        txtMarca.setText("");
-        txtModelo.setText("");
-        txtAnio.setText("");
-        txtColor.setText("");
-        txtVin.setText("");
-        txtBuscar.setText("");
+        txtPlaca.setText(""); txtMarca.setText(""); txtModelo.setText("");
+        txtAnio.setText(""); txtColor.setText(""); txtVin.setText(""); txtBuscar.setText("");
         if (cmbCliente.getItemCount() > 0) cmbCliente.setSelectedIndex(0);
         idSeleccionado = -1;
         tabla.clearSelection();
@@ -400,19 +345,14 @@ public class VehiculoView extends JFrame {
 
     private JButton roundButton(String text, Color bg) {
         JButton btn = new JButton(text);
-        btn.setBackground(bg);
-        btn.setForeground(Color.WHITE);
+        btn.setBackground(bg); btn.setForeground(Color.WHITE);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
+        btn.setFocusPainted(false); btn.setBorderPainted(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
 
-    private void setStatus(String msg, Color color) {
-        lblStatus.setText(msg);
-        lblStatus.setForeground(color);
-    }
+    private void setStatus(String msg, Color color) { lblStatus.setText(msg); lblStatus.setForeground(color); }
 
     public static void main(String[] args) {
         FlatDarkLaf.setup();

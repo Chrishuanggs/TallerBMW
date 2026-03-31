@@ -150,12 +150,12 @@ public class OrdenServicioView extends JPanel {
         panel.setAlignmentX(LEFT_ALIGNMENT);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
 
-        JButton btnCrear      = roundButton("Crear Orden", SUCCESS);
-        JButton btnEnProceso  = roundButton("En Proceso", ACCENT);
-        JButton btnCompletar  = roundButton("Completar", new Color(39, 174, 96).darker());
-        JButton btnCancelar   = roundButton("Cancelar", DANGER);
-        JButton btnCosto      = roundButton("Actualizar Costo", WARNING);
-        JButton btnLimpiar    = roundButton("Limpiar", new Color(80, 80, 80));
+        JButton btnCrear     = roundButton("Crear Orden", SUCCESS);
+        JButton btnEnProceso = roundButton("En Proceso", ACCENT);
+        JButton btnCompletar = roundButton("Completar", new Color(39, 174, 96).darker());
+        JButton btnCancelar  = roundButton("Cancelar", DANGER);
+        JButton btnCosto     = roundButton("Actualizar Costo", WARNING);
+        JButton btnLimpiar   = roundButton("Limpiar", new Color(80, 80, 80));
 
         btnCrear.addActionListener(e -> crearOrden());
         btnEnProceso.addActionListener(e -> cambiarEstado("EN_PROCESO"));
@@ -164,12 +164,9 @@ public class OrdenServicioView extends JPanel {
         btnCosto.addActionListener(e -> actualizarCosto());
         btnLimpiar.addActionListener(e -> limpiar());
 
-        panel.add(btnCrear);
-        panel.add(btnLimpiar);
-        panel.add(btnEnProceso);
-        panel.add(btnCosto);
-        panel.add(btnCompletar);
-        panel.add(btnCancelar);
+        panel.add(btnCrear);    panel.add(btnLimpiar);
+        panel.add(btnEnProceso); panel.add(btnCosto);
+        panel.add(btnCompletar); panel.add(btnCancelar);
         return panel;
     }
 
@@ -189,19 +186,17 @@ public class OrdenServicioView extends JPanel {
         tabla.getColumnModel().getColumn(0).setMaxWidth(45);
         tabla.getColumnModel().getColumn(4).setMinWidth(90);
 
-        // Colorear filas por estado
         tabla.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object val, boolean sel, boolean foc, int row, int col) {
                 super.getTableCellRendererComponent(t, val, sel, foc, row, col);
                 if (sel) {
-                    setBackground(ACCENT);
-                    setForeground(Color.WHITE);
+                    setBackground(ACCENT); setForeground(Color.WHITE);
                 } else {
                     String estado = (String) modeloTabla.getValueAt(row, 4);
-                    if ("COMPLETADA".equals(estado)) setBackground(new Color(30, 60, 40));
+                    if ("COMPLETADA".equals(estado))      setBackground(new Color(30, 60, 40));
                     else if ("EN_PROCESO".equals(estado)) setBackground(new Color(30, 50, 70));
-                    else if ("CANCELADA".equals(estado)) setBackground(new Color(60, 30, 30));
+                    else if ("CANCELADA".equals(estado))  setBackground(new Color(60, 30, 30));
                     else setBackground(row % 2 == 0 ? BG_CARD : new Color(45, 45, 45));
                     setForeground(Color.WHITE);
                 }
@@ -299,8 +294,7 @@ public class OrdenServicioView extends JPanel {
             int idVehiculo = vehiculos.get(cmbVehiculo.getSelectedIndex()).getId();
             int idMecanico = mecanicos.get(cmbMecanico.getSelectedIndex()).getId();
             controller.crear(txtDescripcion.getText(), idVehiculo, idMecanico, usuarioActivo);
-            cargarTabla();
-            limpiar();
+            cargarTabla(); limpiar();
             setStatus("Orden creada correctamente", SUCCESS);
         } catch (Exception ex) {
             setStatus("Error: " + ex.getMessage(), DANGER);
@@ -309,10 +303,7 @@ public class OrdenServicioView extends JPanel {
     }
 
     private void cambiarEstado(String estado) {
-        if (idSeleccionado == -1) {
-            JOptionPane.showMessageDialog(this, "Selecciona una orden primero");
-            return;
-        }
+        if (idSeleccionado == -1) { JOptionPane.showMessageDialog(this, "Selecciona una orden primero"); return; }
         try {
             controller.cambiarEstado(idSeleccionado, estado);
             cargarTabla();
@@ -324,14 +315,8 @@ public class OrdenServicioView extends JPanel {
     }
 
     private void completarOrden() {
-        if (idSeleccionado == -1) {
-            JOptionPane.showMessageDialog(this, "Selecciona una orden primero");
-            return;
-        }
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Marcar esta orden como completada?", "Confirmar",
-                JOptionPane.YES_NO_OPTION
-        );
+        if (idSeleccionado == -1) { JOptionPane.showMessageDialog(this, "Selecciona una orden primero"); return; }
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Marcar esta orden como completada?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 controller.cerrarOrden(idSeleccionado);
@@ -344,10 +329,7 @@ public class OrdenServicioView extends JPanel {
     }
 
     private void actualizarCosto() {
-        if (idSeleccionado == -1) {
-            JOptionPane.showMessageDialog(this, "Selecciona una orden primero");
-            return;
-        }
+        if (idSeleccionado == -1) { JOptionPane.showMessageDialog(this, "Selecciona una orden primero"); return; }
         try {
             controller.actualizarCosto(idSeleccionado, txtCosto.getText());
             cargarTabla();
@@ -367,7 +349,6 @@ public class OrdenServicioView extends JPanel {
         tabla.clearSelection();
     }
 
-    // Helpers
     private JPanel buildFieldGroup(String label, JTextField field) {
         JPanel group = new JPanel(new BorderLayout(0, 4));
         group.setBackground(BG_CARD);
@@ -411,17 +392,12 @@ public class OrdenServicioView extends JPanel {
 
     private JButton roundButton(String text, Color bg) {
         JButton btn = new JButton(text);
-        btn.setBackground(bg);
-        btn.setForeground(Color.WHITE);
+        btn.setBackground(bg); btn.setForeground(Color.WHITE);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
+        btn.setFocusPainted(false); btn.setBorderPainted(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
 
-    private void setStatus(String msg, Color color) {
-        lblStatus.setText(msg);
-        lblStatus.setForeground(color);
-    }
+    private void setStatus(String msg, Color color) { lblStatus.setText(msg); lblStatus.setForeground(color); }
 }

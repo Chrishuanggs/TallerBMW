@@ -47,7 +47,6 @@ public class LoginView extends JFrame {
         ));
         card.setPreferredSize(new Dimension(340, 380));
 
-        // Logo / título
         JLabel lblTitulo = new JLabel("Taller BMW");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 26));
         lblTitulo.setForeground(Color.WHITE);
@@ -58,14 +57,12 @@ public class LoginView extends JFrame {
         lblSub.setForeground(TEXT_MUTED);
         lblSub.setAlignmentX(CENTER_ALIGNMENT);
 
-        // Campos
         txtUsuario = styledField("Usuario");
         txtPassword = new JPasswordField();
         txtPassword.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         txtPassword.putClientProperty("JTextField.placeholderText", "Contraseña");
         txtPassword.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
 
-        // Enter en password hace login
         txtPassword.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) intentarLogin();
@@ -101,16 +98,12 @@ public class LoginView extends JFrame {
         lblError.setText(" ");
         try {
             Usuario u = controller.login(txtUsuario.getText(), new String(txtPassword.getPassword()));
-            abrirMainView(u);
+            new MainView(u).setVisible(true);
+            dispose();
         } catch (Exception ex) {
             lblError.setText(ex.getMessage());
             txtPassword.setText("");
         }
-    }
-
-    private void abrirMainView(Usuario u) {
-        new MainView(u).setVisible(true);
-        dispose();
     }
 
     private JPanel buildFieldGroup(String label, JComponent field) {

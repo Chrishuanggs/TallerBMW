@@ -13,7 +13,6 @@ public class ClienteDAO {
         String query = "INSERT INTO cliente (nombre, telefono, correo, direccion, fecha_registro, activo) VALUES (?, ?, ?, ?, ?, ?)";
         Connection con = DBConnection.getConnection();
         PreparedStatement ps = con.prepareStatement(query);
-
         ps.setString(1, c.getNombre());
         ps.setString(2, c.getTelefono());
         ps.setString(3, c.getCorreo());
@@ -21,9 +20,7 @@ public class ClienteDAO {
         ps.setDate(5, Date.valueOf(c.getFechaRegistro()));
         ps.setBoolean(6, true);
         ps.executeUpdate();
-
-        ps.close();
-        con.close();
+        ps.close(); con.close();
     }
 
     public List<Cliente> listar() throws SQLException {
@@ -32,13 +29,8 @@ public class ClienteDAO {
         Connection con = DBConnection.getConnection();
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
-
-        while (rs.next()) {
-            clientes.add(mapear(rs));
-        }
-
-        rs.close();
-        con.close();
+        while (rs.next()) clientes.add(mapear(rs));
+        rs.close(); con.close();
         return clientes;
     }
 
@@ -58,27 +50,22 @@ public class ClienteDAO {
         String query = "UPDATE cliente SET nombre=?, telefono=?, correo=?, direccion=? WHERE id=?";
         Connection con = DBConnection.getConnection();
         PreparedStatement ps = con.prepareStatement(query);
-
         ps.setString(1, c.getNombre());
         ps.setString(2, c.getTelefono());
         ps.setString(3, c.getCorreo());
         ps.setString(4, c.getDireccion());
         ps.setInt(5, c.getId());
         ps.executeUpdate();
-
-        ps.close();
-        con.close();
+        ps.close(); con.close();
     }
 
-    // Soft delete — no borramos el registro, solo lo marcamos inactivo
     public void eliminar(int id) throws SQLException {
         String query = "UPDATE cliente SET activo = false WHERE id = ?";
         Connection con = DBConnection.getConnection();
         PreparedStatement ps = con.prepareStatement(query);
         ps.setInt(1, id);
         ps.executeUpdate();
-        ps.close();
-        con.close();
+        ps.close(); con.close();
     }
 
     public boolean tieneVehiculos(int idCliente) throws SQLException {

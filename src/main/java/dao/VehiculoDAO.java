@@ -13,7 +13,6 @@ public class VehiculoDAO {
         String query = "INSERT INTO vehiculo (placa, marca, modelo, anio, color, vin, id_cliente, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         Connection con = DBConnection.getConnection();
         PreparedStatement ps = con.prepareStatement(query);
-
         ps.setString(1, v.getPlaca());
         ps.setString(2, v.getMarca());
         ps.setString(3, v.getModelo());
@@ -23,28 +22,22 @@ public class VehiculoDAO {
         ps.setInt(7, v.getIdCliente());
         ps.setBoolean(8, true);
         ps.executeUpdate();
-
-        ps.close();
-        con.close();
+        ps.close(); con.close();
     }
 
     public List<Vehiculo> listar() throws SQLException {
         List<Vehiculo> vehiculos = new ArrayList<>();
-        // Join para traer el nombre del cliente directamente
         String query = "SELECT v.*, c.nombre AS nombre_cliente FROM vehiculo v " +
                 "JOIN cliente c ON v.id_cliente = c.id WHERE v.activo = true";
         Connection con = DBConnection.getConnection();
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
-
         while (rs.next()) {
             Vehiculo v = mapear(rs);
             v.setNombreCliente(rs.getString("nombre_cliente"));
             vehiculos.add(v);
         }
-
-        rs.close();
-        con.close();
+        rs.close(); con.close();
         return vehiculos;
     }
 
@@ -56,15 +49,12 @@ public class VehiculoDAO {
         PreparedStatement ps = con.prepareStatement(query);
         ps.setInt(1, idCliente);
         ResultSet rs = ps.executeQuery();
-
         while (rs.next()) {
             Vehiculo v = mapear(rs);
             v.setNombreCliente(rs.getString("nombre_cliente"));
             vehiculos.add(v);
         }
-
-        rs.close();
-        con.close();
+        rs.close(); con.close();
         return vehiculos;
     }
 
@@ -84,7 +74,6 @@ public class VehiculoDAO {
         String query = "UPDATE vehiculo SET placa=?, marca=?, modelo=?, anio=?, color=?, vin=?, id_cliente=? WHERE id=?";
         Connection con = DBConnection.getConnection();
         PreparedStatement ps = con.prepareStatement(query);
-
         ps.setString(1, v.getPlaca());
         ps.setString(2, v.getMarca());
         ps.setString(3, v.getModelo());
@@ -94,9 +83,7 @@ public class VehiculoDAO {
         ps.setInt(7, v.getIdCliente());
         ps.setInt(8, v.getId());
         ps.executeUpdate();
-
-        ps.close();
-        con.close();
+        ps.close(); con.close();
     }
 
     public void eliminar(int id) throws SQLException {
@@ -105,8 +92,7 @@ public class VehiculoDAO {
         PreparedStatement ps = con.prepareStatement(query);
         ps.setInt(1, id);
         ps.executeUpdate();
-        ps.close();
-        con.close();
+        ps.close(); con.close();
     }
 
     public boolean tieneOrdenes(int idVehiculo) throws SQLException {

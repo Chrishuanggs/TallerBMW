@@ -28,12 +28,6 @@ public class MainView extends JFrame {
         initUI();
     }
 
-    private void abrirOrdenes() {
-        panelContenido.removeAll();
-        panelContenido.add(new OrdenServicioView(usuarioActivo), BorderLayout.CENTER);
-        panelContenido.revalidate();
-        panelContenido.repaint();
-    }
     private void initUI() {
         getContentPane().setBackground(BG_PANEL);
         setLayout(new BorderLayout());
@@ -95,23 +89,16 @@ public class MainView extends JFrame {
         sidebar.add(menuLabel("MENÚ"));
         sidebar.add(Box.createVerticalStrut(10));
 
-        // Clientes y Vehículos — todos los roles los ven
         sidebar.add(menuButton("👤  Clientes", () -> abrirClientes()));
         sidebar.add(menuButton("🚗  Vehículos", () -> abrirVehiculos()));
+        sidebar.add(menuButton("🔧  Órdenes de Servicio", () -> abrirOrdenes()));
 
-        // Órdenes de Servicio
-        if (!usuarioActivo.getRol().equals("ADMIN") || true) {
-            sidebar.add(menuButton("🔧  Órdenes de Servicio", () -> abrirOrdenes()));
-        }
-
-        // Inventario — solo Admin y Mecánico
         if (!usuarioActivo.getRol().equals("RECEPCIONISTA")) {
             sidebar.add(menuButton("📦  Inventario", () -> proximamente("Inventario")));
         }
 
-        // Usuarios — solo Admin
         if (usuarioActivo.getRol().equals("ADMIN")) {
-            sidebar.add(menuButton("👥  Usuarios", () -> proximamente("Usuarios")));
+            sidebar.add(menuButton("👥  Usuarios", () -> abrirUsuarios()));
         }
 
         sidebar.add(Box.createVerticalGlue());
@@ -185,7 +172,6 @@ public class MainView extends JFrame {
         card.add(lblIndicacion);
 
         centro.add(card);
-
         panelContenido.add(centro, BorderLayout.CENTER);
         panelContenido.revalidate();
         panelContenido.repaint();
@@ -201,6 +187,20 @@ public class MainView extends JFrame {
     private void abrirVehiculos() {
         panelContenido.removeAll();
         panelContenido.add(new VehiculoView().getContentPane(), BorderLayout.CENTER);
+        panelContenido.revalidate();
+        panelContenido.repaint();
+    }
+
+    private void abrirOrdenes() {
+        panelContenido.removeAll();
+        panelContenido.add(new OrdenServicioView(usuarioActivo), BorderLayout.CENTER);
+        panelContenido.revalidate();
+        panelContenido.repaint();
+    }
+
+    private void abrirUsuarios() {
+        panelContenido.removeAll();
+        panelContenido.add(new UsuarioView(usuarioActivo).getContentPane(), BorderLayout.CENTER);
         panelContenido.revalidate();
         panelContenido.repaint();
     }
@@ -234,7 +234,6 @@ public class MainView extends JFrame {
         card.add(lblSub);
 
         centro.add(card);
-
         panelContenido.add(centro, BorderLayout.CENTER);
         panelContenido.revalidate();
         panelContenido.repaint();

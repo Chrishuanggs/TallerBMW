@@ -14,7 +14,6 @@ public class OrdenServicioDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
         Connection con = DBConnection.getConnection();
         PreparedStatement ps = con.prepareStatement(query);
-
         ps.setTimestamp(1, Timestamp.valueOf(o.getFechaEntrada()));
         ps.setString(2, o.getDescripcion());
         ps.setString(3, o.getEstado());
@@ -23,9 +22,7 @@ public class OrdenServicioDAO {
         ps.setInt(6, o.getIdMecanico());
         ps.setInt(7, o.getIdRecepcionista());
         ps.executeUpdate();
-
-        ps.close();
-        con.close();
+        ps.close(); con.close();
     }
 
     public List<OrdenServicio> listar() throws SQLException {
@@ -41,7 +38,6 @@ public class OrdenServicioDAO {
         Connection con = DBConnection.getConnection();
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
-
         while (rs.next()) {
             OrdenServicio o = mapear(rs);
             o.setPlacaVehiculo(rs.getString("placa_vehiculo"));
@@ -50,9 +46,7 @@ public class OrdenServicioDAO {
             o.setNombreRecepcionista(rs.getString("nombre_recepcionista"));
             ordenes.add(o);
         }
-
-        rs.close();
-        con.close();
+        rs.close(); con.close();
         return ordenes;
     }
 
@@ -70,7 +64,6 @@ public class OrdenServicioDAO {
         PreparedStatement ps = con.prepareStatement(query);
         ps.setString(1, estado);
         ResultSet rs = ps.executeQuery();
-
         while (rs.next()) {
             OrdenServicio o = mapear(rs);
             o.setPlacaVehiculo(rs.getString("placa_vehiculo"));
@@ -79,9 +72,7 @@ public class OrdenServicioDAO {
             o.setNombreRecepcionista(rs.getString("nombre_recepcionista"));
             ordenes.add(o);
         }
-
-        rs.close();
-        con.close();
+        rs.close(); con.close();
         return ordenes;
     }
 
@@ -92,8 +83,7 @@ public class OrdenServicioDAO {
         ps.setString(1, estado);
         ps.setInt(2, id);
         ps.executeUpdate();
-        ps.close();
-        con.close();
+        ps.close(); con.close();
     }
 
     public void actualizarCosto(int id, double costo) throws SQLException {
@@ -103,8 +93,7 @@ public class OrdenServicioDAO {
         ps.setDouble(1, costo);
         ps.setInt(2, id);
         ps.executeUpdate();
-        ps.close();
-        con.close();
+        ps.close(); con.close();
     }
 
     public void cerrarOrden(int id) throws SQLException {
@@ -114,8 +103,7 @@ public class OrdenServicioDAO {
         ps.setTimestamp(1, Timestamp.valueOf(java.time.LocalDateTime.now()));
         ps.setInt(2, id);
         ps.executeUpdate();
-        ps.close();
-        con.close();
+        ps.close(); con.close();
     }
 
     private OrdenServicio mapear(ResultSet rs) throws SQLException {
